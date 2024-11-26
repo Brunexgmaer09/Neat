@@ -127,6 +127,21 @@ void Populacao::evoluir() {
     std::wcout << L"Nova população criada com " << novaGeracao.size() << L" indivíduos" << std::endl;
     std::wcout << L"--------------------------------" << std::endl;
     
+    // Calcular estatísticas antes do callback
+    float aptidaoTotal = 0;
+    float aptidaoMinima = individuos[0].obterAptidao();
+    float aptidaoMaxima = individuos[0].obterAptidao();
+    
+    for (const auto& individuo : individuos) {
+        float aptidao = individuo.obterAptidao();
+        aptidaoTotal += aptidao;
+        aptidaoMinima = std::min(aptidaoMinima, aptidao);
+        aptidaoMaxima = std::max(aptidaoMaxima, aptidao);
+    }
+    
+    float aptidaoMedia = aptidaoTotal / individuos.size();
+    melhorAptidao = std::max(melhorAptidao, aptidaoMaxima);
+
     // Atualizar população
     individuos = std::move(novaGeracao);
     geracao++;
@@ -135,8 +150,8 @@ void Populacao::evoluir() {
     if (onGeracaoCallback) {
         onGeracaoCallback(geracao, 
                          melhorAptidao, 
-                         aptidaoMedia, 
-                         aptidaoMinima);
+                         aptidaoMedia,  // Agora está definida
+                         aptidaoMinima); // Agora está definida
     }
 }
 
