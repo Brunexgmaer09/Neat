@@ -1,0 +1,88 @@
+NEAT Library
+============
+
+Uma implementação simples e reutilizável do algoritmo NEAT (NeuroEvolution of Augmenting Topologies).
+
+Como usar
+---------
+
+1. Inclua os headers necessários:
+
+    #include "NEAT/include/Rede.h"
+    #include "NEAT/include/Populacao.h"
+    #include "NEAT/include/Visualizador.h"
+    using namespace NEAT;
+
+2. Configure e crie uma população:
+
+    Populacao::Configuracao config;
+    config.tamanhoPopulacao = 50;
+    config.taxaMutacao = 0.3f;
+    config.taxaCruzamento = 0.8f;
+    config.taxaElitismo = 0.1f;
+
+    Populacao populacao(5, 1, config);  // 5 entradas, 1 saída
+
+3. Defina uma função de avaliação:
+
+    float avaliarRede(Rede& rede) {
+        // Exemplo: avaliar a rede em seu jogo/problema
+        std::vector<float> entradas = {0.5f, 0.3f, 0.8f, 0.2f, 0.1f};
+        rede.definirEntradas(entradas);
+        rede.avaliar();
+        return pontuacao;  // Retorne a aptidão/pontuação
+    }
+
+4. Execute a evolução:
+
+    // Opcional: definir callback para acompanhar progresso
+    populacao.definirCallbackGeracao([](int geracao, float melhor, float media, float pior) {
+        std::cout << "Geracao " << geracao << ": " << melhor << std::endl;
+    });
+
+    // Evoluir por várias gerações
+    for (int i = 0; i < 100; i++) {
+        populacao.avaliarPopulacao(avaliarRede);
+        populacao.evoluir();
+    }
+
+5. Visualize a melhor rede (se estiver usando SDL):
+
+    Visualizador::Configuracao visConfig;
+    visConfig.largura = 200;
+    visConfig.altura = 300;
+    visConfig.raioNo = 5;
+    visConfig.mostrarPesos = true;
+
+    Visualizador visualizador(renderer, {600, 10, 180, 200}, visConfig);
+    visualizador.renderizar(populacao.obterIndividuos()[0]);
+
+6. Salve/Carregue redes:
+
+    // Salvar melhor rede
+    populacao.salvarMelhorRede("melhor_rede.bin");
+
+    // Carregar rede
+    Rede rede(5, 1);
+    rede.carregar("melhor_rede.bin");
+
+Características
+--------------
+
+- Implementação NEAT completa e modular
+- Visualização da rede neural em tempo real
+- Configurável e extensível
+- Suporte a salvamento/carregamento
+- Namespace próprio para evitar conflitos
+- Callbacks para acompanhamento da evolução
+
+Dependências
+-----------
+
+- SDL2 (apenas para visualização)
+- C++11 ou superior
+
+Licença
+-------
+
+MIT License 
