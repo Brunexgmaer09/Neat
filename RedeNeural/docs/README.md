@@ -1,143 +1,159 @@
-# NEAT (NeuroEvolution of Augmenting Topologies)
+# Biblioteca NEAT (NeuroEvolution of Augmenting Topologies)
 
-Uma implementação em C++ do algoritmo NEAT para evolução de redes neurais. Esta biblioteca permite que redes neurais evoluam tanto sua topologia quanto seus pesos, começando com estruturas simples e tornando-se progressivamente mais complexas.
+**NEAT** é uma implementação robusta e eficiente do algoritmo NEAT em C++, permitindo a evolução de redes neurais através de neuroevolução.
 
-## 📋 Características
+## 🧠 Sobre o Projeto
 
-- Implementação NEAT completa e modular
-- Evolução automática da topologia da rede
-- Visualização em tempo real usando SDL2
-- Sistema de espécies e elitismo
-- Suporte a salvamento/carregamento de redes
-- Namespace próprio para evitar conflitos
-- Callbacks para monitoramento da evolução
+Esta biblioteca implementa o **algoritmo NEAT**, que permite a evolução automática de redes neurais. O sistema começa com redes simples e aumenta gradualmente sua complexidade através de mutações e evolução natural.
 
-## 🚀 Como Usar
+## ✨ Características Principais
 
-### Requisitos
+- **Evolução automática da topologia da rede**
+- **Sistema de espécies aprimorado**
+  - Distribuição proporcional de slots por espécie
+  - Elitismo por espécie
+  - Cálculo de compatibilidade otimizado
+- **Crescimento gradual da complexidade**
+- **Sistema de logs detalhados**
+  - Monitoramento de cruzamentos
+  - Estatísticas por espécie
+  - Acompanhamento de evolução
+- **Visualização em tempo real** (usando SDL2)
+- **Salvamento e carregamento de redes**
+- **Interface simples e intuitiva**
+- **Totalmente configurável**
 
-- C++11 ou superior
-- SDL2 (opcional, apenas para visualização)
-- Compilador com suporte a C++11 (g++, clang++, MSVC)
+## 🚀 Começando
 
-### Instalação
+### Pré-requisitos
 
-1. Clone o repositório:
-   git clone https://github.com/seu-usuario/neat-implementation.git
+- **C++17** ou superior
+- **SDL2** (opcional, para visualização)
+- **Compilador compatível**: g++, clang++, MSVC
 
-2. Inclua os arquivos em seu projeto:
-   #include "NEAT/include/Rede.h"
-   #include "NEAT/include/Populacao.h"
-   #include "NEAT/include/Visualizador.h"
+### 📥 Instalação
 
-### Exemplo Básico
+1. **Clone o repositório:**
 
-    #include "NEAT/include/Populacao.h"
-    using namespace NEAT;
+    ```bash
+    git clone https://github.com/seu-usuario/rede-neural-neat.git
+    ```
 
-    int main() {
-        // Configurar a população
-        Populacao::Configuracao config;
-        config.tamanhoPopulacao = 50;
-        config.taxaMutacao = 0.3f;
-        config.taxaCruzamento = 0.8f;
-        config.taxaElitismo = 0.1f;
+2. **Inclua os arquivos em seu projeto:**
 
-        // Criar população (5 entradas, 1 saída)
-        Populacao populacao(5, 1, config);
+    ```cpp
+    #include "RedeNeural/include/Rede.h"
+    #include "RedeNeural/include/Populacao.h"
+    #include "RedeNeural/include/Visualizador.h"
+    ```
 
-        // Definir callback para acompanhar evolução
-        populacao.definirCallbackGeracao([](int geracao, float melhor, float media, float pior) {
-            std::cout << "Geracao " << geracao << ": " << melhor << std::endl;
-        });
+## 💻 Exemplo de Uso
 
-        // Loop principal de evolução
-        for (int geracao = 0; geracao < 100; geracao++) {
-            // Avaliar cada rede na população
-            populacao.avaliarPopulacao([](Rede& rede) {
-                // Seu código de avaliação aqui
-                return pontuacao;
-            });
+```cpp
+#include "RedeNeural/include/Populacao.h"
 
-            // Evoluir para próxima geração
-            populacao.evoluir();
-        }
-    }
+// Configurar população
+NEAT::Populacao::Configuracao config;
+config.tamanhoPopulacao = 200;
+config.taxaMutacao = 0.4f;
+config.taxaCruzamento = 0.8f;
+config.limiarCompatibilidade = 1.0f;
+config.maxEspecies = 15;
 
-### Guia Detalhado
+// Configurar parâmetros NEAT
+NEAT::ConfiguracaoNEAT::COEF_EXCESSO = 1.0f;
+NEAT::ConfiguracaoNEAT::COEF_DISJUNTO = 1.0f;
+NEAT::ConfiguracaoNEAT::COEF_PESO = 0.3f;
 
-1. Configuração da População:
-   Populacao::Configuracao config;
-   config.tamanhoPopulacao = 50;    // Número de indivíduos
-   config.taxaMutacao = 0.3f;       // Chance de mutação (0-1)
-   config.taxaCruzamento = 0.8f;    // Chance de cruzamento (0-1)
-   config.taxaElitismo = 0.1f;      // Percentual de elite preservada
-   config.tamanhoTorneio = 3;       // Tamanho do torneio na seleção
+// Criar população
+NEAT::Populacao populacao(numEntradas, numSaidas, config);
 
-2. Avaliação de Redes:
-   float avaliarRede(Rede& rede) {
-       // Definir entradas
-       std::vector<float> entradas = {0.5f, 0.3f, 0.8f, 0.2f, 0.1f};
-       rede.definirEntradas(entradas);
-       
-       // Processar rede
-       rede.avaliar();
-       
-       // Obter saídas
-       const auto& saidas = rede.obterSaidas();
-       
-       // Calcular pontuação baseada no desempenho
-       float pontuacao = /* seu cálculo aqui */;
-       return pontuacao;
-   }
+// Callback para monitoramento (opcional)
+populacao.definirCallbackGeracao([](int geracao, float melhor, float media, float pior) {
+    std::cout << "Geração " << geracao << ": " << melhor << std::endl;
+});
 
-3. Visualização (com SDL2):
-   Visualizador::Configuracao visConfig;
-   visConfig.largura = 200;
-   visConfig.altura = 300;
-   visConfig.raioNo = 5;
-   visConfig.mostrarPesos = true;
-   visConfig.corFundo = {0, 0, 0, 128};
-   visConfig.corEntrada = {255, 0, 0, 255};
-   visConfig.corOculta = {0, 255, 0, 255};
-   visConfig.corSaida = {0, 0, 255, 255};
+// Evoluir
+populacao.avaliarPopulacao(avaliarRede);
+populacao.evoluir();
+```
 
-   Visualizador visualizador(renderer, {600, 10, 180, 200}, visConfig);
-   visualizador.renderizar(rede);
+## ⚙️ Configuração
 
-4. Salvamento/Carregamento:
-   // Salvar melhor rede
-   populacao.salvarMelhorRede("melhor_rede.bin");
+### Parâmetros Principais
 
-   // Carregar rede
-   Rede rede(5, 1);
-   rede.carregar("melhor_rede.bin");
+```cpp
+// Configuração da População
+Populacao::Configuracao config;
+config.tamanhoPopulacao = 200;    // Tamanho da população
+config.taxaMutacao = 0.4f;        // Chance de mutação
+config.taxaCruzamento = 0.8f;     // Chance de cruzamento
+config.taxaElitismo = 0.1f;       // Percentual de elite
+config.limiarCompatibilidade = 1.0f; // Limiar para formar espécies
+config.maxEspecies = 15;          // Máximo de espécies
 
-### Dicas de Uso
+// Configuração NEAT
+ConfiguracaoNEAT::COEF_EXCESSO = 1.0f;
+ConfiguracaoNEAT::COEF_DISJUNTO = 1.0f;
+ConfiguracaoNEAT::COEF_PESO = 0.3f;
+ConfiguracaoNEAT::CHANCE_NOVO_NO = 0.05f;
+ConfiguracaoNEAT::CHANCE_NOVA_CONEXAO = 0.08f;
+```
 
-1. Ajuste de Parâmetros:
-   - Comece com populações pequenas (50-100)
-   - Use taxas de mutação moderadas (0.2-0.4)
-   - Ajuste o elitismo baseado no problema
+## 📁 Estrutura do Projeto
 
-2. Função de Avaliação:
-   - Deve refletir claramente o objetivo
-   - Considere múltiplos aspectos do desempenho
-   - Evite platôs na função de fitness
+```
+RedeNeural/
+├── include/
+│   ├── Rede.h
+│   ├── Populacao.h
+│   ├── Especie.h
+│   ├── Configuracao.h
+│   └── Visualizador.h
+├── src/
+│   ├── Rede.cpp
+│   ├── Populacao.cpp
+│   ├── Especie.cpp
+│   └── Configuracao.cpp
+└── docs/
+```
 
-3. Otimização:
-   - Use threads para avaliação paralela
-   - Implemente cache de inovações
-   - Monitore a diversidade da população
+## 🆕 Novidades na Versão Atual
 
-### Licença
+- Sistema de espécies aprimorado
+- Logs detalhados do processo evolutivo
+- Melhor distribuição de slots por espécie
+- Parâmetros otimizados para evolução mais eficiente
+- Suporte a callbacks para monitoramento
+- Codificação UTF-8 para logs
 
-MIT License - veja LICENSE.md para detalhes
+## 🤝 Contribuindo
 
-### Contribuindo
+1. **Faça um Fork do projeto**
+2. **Crie sua Feature Branch:**
 
-1. Fork o projeto
-2. Crie sua branch (git checkout -b feature/AmazingFeature)
-3. Commit suas mudanças (git commit -m 'Add some AmazingFeature')
-4. Push para a branch (git push origin feature/AmazingFeature)
-5. Abra um Pull Request
+    ```bash
+    git checkout -b feature/NovaFeature
+    ```
+
+3. **Commit suas mudanças:**
+
+    ```bash
+    git commit -m 'Adiciona nova feature'
+    ```
+
+4. **Push para a Branch:**
+
+    ```bash
+    git push origin feature/NovaFeature
+    ```
+
+5. **Abra um Pull Request**
+
+## 📝 Licença
+
+Este projeto está sob a licença **MIT**. Veja o arquivo LICENSE para mais detalhes.
+
+**Link do Projeto:** [https://github.com/seu-usuario/rede-neural-neat](https://github.com/seu-usuario/rede-neural-neat)
+
+⭐️ **From BrunexCoder**
